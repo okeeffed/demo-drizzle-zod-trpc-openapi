@@ -1,0 +1,463 @@
+diff --git a/dist/adapters/aws-lambda.d.ts.map b/dist/adapters/aws-lambda.d.ts.map
+index 6e1ae85fb93eae47bde524178687dc7bfda36042..1d0a08b85185118c3c5a0aa63ce7d8cc86e7bdde 100644
+--- a/dist/adapters/aws-lambda.d.ts.map
++++ b/dist/adapters/aws-lambda.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"aws-lambda.d.ts","sourceRoot":"","sources":["../../src/adapters/aws-lambda.ts"],"names":[],"mappings":"AACA,OAAO,EACL,eAAe,EACf,gBAAgB,EAOjB,MAAM,kCAAkC,CAAC;AAE1C,OAAO,KAAK,EAAE,OAAO,IAAI,YAAY,EAAE,MAAM,YAAY,CAAC;AAK1D,OAAO,KAAK,EAAwB,aAAa,EAAE,MAAM,UAAU,CAAC;AAIpE,MAAM,MAAM,oCAAoC,CAC9C,OAAO,SAAS,aAAa,EAC7B,MAAM,SAAS,eAAe,IAC5B,IAAI,CACN,gBAAgB,CAAC,OAAO,EAAE,MAAM,CAAC,EACjC,QAAQ,GAAG,eAAe,GAAG,cAAc,GAAG,SAAS,CACxD,CAAC;AAiDF,eAAO,MAAM,6BAA6B,2JAMF,YAAY;;;;;;;;;;;;;;EAkEnD,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"aws-lambda.d.ts","sourceRoot":"","sources":["../../src/adapters/aws-lambda.ts"],"names":[],"mappings":"AACA,OAAO,EACL,eAAe,EACf,gBAAgB,EAOjB,MAAM,kCAAkC,CAAC;AAE1C,OAAO,KAAK,EAAE,OAAO,IAAI,YAAY,EAAE,MAAM,YAAY,CAAC;AAK1D,OAAO,KAAK,EAAwB,aAAa,EAAE,MAAM,UAAU,CAAC;AAIpE,MAAM,MAAM,oCAAoC,CAC9C,OAAO,SAAS,aAAa,EAC7B,MAAM,SAAS,eAAe,IAC5B,IAAI,CACN,gBAAgB,CAAC,OAAO,EAAE,MAAM,CAAC,EACjC,QAAQ,GAAG,eAAe,GAAG,cAAc,GAAG,SAAS,CACxD,CAAC;AAqEF,eAAO,MAAM,6BAA6B,2JAMF,YAAY;;;;;;;;;;;;;;EAkEnD,CAAC"}
+\ No newline at end of file
+diff --git a/dist/adapters/aws-lambda.js b/dist/adapters/aws-lambda.js
+index 1007181498de5b974955875fdd6376bfb8ccde8a..bc91121f4f6c233a21997ac6a76cb38cea9e66c9 100644
+--- a/dist/adapters/aws-lambda.js
++++ b/dist/adapters/aws-lambda.js
+@@ -36,6 +36,27 @@ const createMockNodeHTTPRequest = (path, event) => {
+             });
+         }
+     }
++    if (contentType === 'application/x-www-form-urlencoded') {
++        try {
++            if (event.body) {
++                const searchParamsString = event.isBase64Encoded
++                    ? Buffer.from(event.body, 'base64').toString('utf-8')
++                    : event.body;
++                const searchParams = new URLSearchParams(searchParamsString);
++                body = {};
++                for (const [key, value] of searchParams.entries()) {
++                    body[key] = value;
++                }
++            }
++        }
++        catch (cause) {
++            throw new server_1.TRPCError({
++                message: 'Failed to parse request body',
++                code: 'PARSE_ERROR',
++                cause,
++            });
++        }
++    }
+     return (0, node_mocks_http_1.createRequest)({
+         url,
+         method,
+diff --git a/dist/adapters/aws-lambda.js.map b/dist/adapters/aws-lambda.js.map
+index 9f9a2b35d6a0394cb117a1b393341e4de141db0d..b862d130adf547125683971a43e88264d85098d1 100644
+--- a/dist/adapters/aws-lambda.js.map
++++ b/dist/adapters/aws-lambda.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"aws-lambda.js","sourceRoot":"","sources":["../../src/adapters/aws-lambda.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"aws-lambda.js","sourceRoot":"","sources":["../../src/adapters/aws-lambda.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/dist/adapters/fetch.d.ts b/dist/adapters/fetch.d.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..1f6e69ca13fb637ec223cbf3347d70ecf9ee4e37
+--- /dev/null
++++ b/dist/adapters/fetch.d.ts
+@@ -0,0 +1,8 @@
++import { FetchHandlerOptions } from '@trpc/server/adapters/fetch';
++import { OpenApiRouter } from '../types';
++export type CreateOpenApiFetchHandlerOptions<TRouter extends OpenApiRouter> = Omit<FetchHandlerOptions<TRouter>, 'batching'> & {
++    req: Request;
++    endpoint: `/${string}`;
++};
++export declare const createOpenApiFetchHandler: <TRouter extends OpenApiRouter>(opts: CreateOpenApiFetchHandlerOptions<TRouter>) => Promise<Response>;
++//# sourceMappingURL=fetch.d.ts.map
+\ No newline at end of file
+diff --git a/dist/adapters/fetch.d.ts.map b/dist/adapters/fetch.d.ts.map
+new file mode 100644
+index 0000000000000000000000000000000000000000..3d3ff272c042346ac46fbdb26d8167fbb0071b22
+--- /dev/null
++++ b/dist/adapters/fetch.d.ts.map
+@@ -0,0 +1 @@
++{"version":3,"file":"fetch.d.ts","sourceRoot":"","sources":["../../src/adapters/fetch.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,mBAAmB,EAAE,MAAM,6BAA6B,CAAC;AAGlE,OAAO,EAAE,aAAa,EAAE,MAAM,UAAU,CAAC;AAMzC,MAAM,MAAM,gCAAgC,CAAC,OAAO,SAAS,aAAa,IAAI,IAAI,CAChF,mBAAmB,CAAC,OAAO,CAAC,EAC5B,UAAU,CACX,GAAG;IACF,GAAG,EAAE,OAAO,CAAC;IACb,QAAQ,EAAE,IAAI,MAAM,EAAE,CAAC;CACxB,CAAC;AA8EF,eAAO,MAAM,yBAAyB,sFAEnC,QAAQ,QAAQ,CAoDlB,CAAC"}
+\ No newline at end of file
+diff --git a/dist/adapters/fetch.js b/dist/adapters/fetch.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..d4c03ea854c52361fe49381e35ddb522d8d247a0
+--- /dev/null
++++ b/dist/adapters/fetch.js
+@@ -0,0 +1,116 @@
++"use strict";
++Object.defineProperty(exports, "__esModule", { value: true });
++exports.createOpenApiFetchHandler = void 0;
++const server_1 = require("@trpc/server");
++const core_1 = require("./node-http/core");
++const getUrlEncodedBody = async (req) => {
++    const params = new URLSearchParams(await req.text());
++    const data = {};
++    for (const key of params.keys()) {
++        data[key] = params.getAll(key);
++    }
++    return data;
++};
++// co-body does not parse Request body correctly
++const getRequestBody = async (req) => {
++    var _a, _b;
++    try {
++        if ((_a = req.headers.get('content-type')) === null || _a === void 0 ? void 0 : _a.includes('application/json')) {
++            return {
++                isValid: true,
++                // use JSON.parse instead of req.json() because req.json() does not throw on invalid JSON
++                data: JSON.parse(await req.text()),
++            };
++        }
++        if ((_b = req.headers.get('content-type')) === null || _b === void 0 ? void 0 : _b.includes('application/x-www-form-urlencoded')) {
++            return {
++                isValid: true,
++                data: await getUrlEncodedBody(req),
++            };
++        }
++        return {
++            isValid: true,
++            data: req.body,
++        };
++    }
++    catch (err) {
++        return {
++            isValid: false,
++            cause: err,
++        };
++    }
++};
++const createRequestProxy = async (req, url) => {
++    const body = await getRequestBody(req);
++    return new Proxy(req, {
++        get: (target, prop) => {
++            if (prop === 'url') {
++                return url ? url : target.url;
++            }
++            if (prop === 'headers') {
++                return new Proxy(target.headers, {
++                    get: (target, prop) => {
++                        return target.get(prop.toString());
++                    },
++                });
++            }
++            if (prop === 'body') {
++                if (!body.isValid) {
++                    throw new server_1.TRPCError({
++                        code: 'PARSE_ERROR',
++                        message: 'Failed to parse request body',
++                        cause: body.cause,
++                    });
++                }
++                return body.data;
++            }
++            return target[prop];
++        },
++    });
++};
++const createOpenApiFetchHandler = async (opts) => {
++    const resHeaders = new Headers();
++    const url = new URL(opts.req.url.replace(opts.endpoint, ''));
++    const req = await createRequestProxy(opts.req, url.toString());
++    const createContext = () => {
++        if (opts.createContext) {
++            return opts.createContext({ req: opts.req, resHeaders });
++        }
++        return () => ({});
++    };
++    const openApiHttpHandler = (0, core_1.createOpenApiNodeHttpHandler)({
++        router: opts.router,
++        createContext,
++        onError: opts.onError,
++        responseMeta: opts.responseMeta,
++    });
++    return new Promise((resolve) => {
++        let statusCode;
++        return openApiHttpHandler(req, {
++            setHeader: (key, value) => {
++                if (typeof value === 'string') {
++                    resHeaders.set(key, value);
++                }
++                else {
++                    for (const v of value) {
++                        resHeaders.append(key, v);
++                    }
++                }
++            },
++            get statusCode() {
++                return statusCode;
++            },
++            set statusCode(code) {
++                statusCode = code;
++            },
++            end: (body) => {
++                resolve(new Response(body, {
++                    headers: resHeaders,
++                    status: statusCode,
++                }));
++            },
++        });
++    });
++};
++exports.createOpenApiFetchHandler = createOpenApiFetchHandler;
++//# sourceMappingURL=fetch.js.map
+\ No newline at end of file
+diff --git a/dist/adapters/fetch.js.map b/dist/adapters/fetch.js.map
+new file mode 100644
+index 0000000000000000000000000000000000000000..3e1ef2cdfd44e7673d9c4c63d8f0fd573f7cc52d
+--- /dev/null
++++ b/dist/adapters/fetch.js.map
+@@ -0,0 +1 @@
++{"version":3,"file":"fetch.js","sourceRoot":"","sources":["../../src/adapters/fetch.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/dist/adapters/index.d.ts b/dist/adapters/index.d.ts
+index 38ed41bc6e8465523acf015df2990e0c7788738d..6d4065327d2b398fe205ad5dd396442413d8c57d 100644
+--- a/dist/adapters/index.d.ts
++++ b/dist/adapters/index.d.ts
+@@ -3,5 +3,6 @@ export * from './standalone';
+ export * from './express';
+ export * from './next';
+ export * from './fastify';
++export * from './fetch';
+ export * from './nuxt';
+ //# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
+diff --git a/dist/adapters/index.d.ts.map b/dist/adapters/index.d.ts.map
+index bfa51127090048d8738e99769bdca81a181cf135..8fccd76adc0dc94dfb5f810b60aef7e95e9f938a 100644
+--- a/dist/adapters/index.d.ts.map
++++ b/dist/adapters/index.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../src/adapters/index.ts"],"names":[],"mappings":"AAAA,cAAc,cAAc,CAAC;AAC7B,cAAc,cAAc,CAAC;AAC7B,cAAc,WAAW,CAAC;AAC1B,cAAc,QAAQ,CAAC;AACvB,cAAc,WAAW,CAAC;AAC1B,cAAc,QAAQ,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../../src/adapters/index.ts"],"names":[],"mappings":"AAAA,cAAc,cAAc,CAAC;AAC7B,cAAc,cAAc,CAAC;AAC7B,cAAc,WAAW,CAAC;AAC1B,cAAc,QAAQ,CAAC;AACvB,cAAc,WAAW,CAAC;AAC1B,cAAc,SAAS,CAAC;AACxB,cAAc,QAAQ,CAAC"}
+\ No newline at end of file
+diff --git a/dist/adapters/index.js b/dist/adapters/index.js
+index 4341f8fd369e8ca33994eeb1bb15b92c785c608e..537d30498b4d90452c65e9bec837339de752aa23 100644
+--- a/dist/adapters/index.js
++++ b/dist/adapters/index.js
+@@ -19,5 +19,6 @@ __exportStar(require("./standalone"), exports);
+ __exportStar(require("./express"), exports);
+ __exportStar(require("./next"), exports);
+ __exportStar(require("./fastify"), exports);
++__exportStar(require("./fetch"), exports);
+ __exportStar(require("./nuxt"), exports);
+ //# sourceMappingURL=index.js.map
+\ No newline at end of file
+diff --git a/dist/adapters/index.js.map b/dist/adapters/index.js.map
+index d5d552fcddfcc46d67f118c8a8649a0cf791b349..a95e8f84eafb6ed7e9c30e01b34295bd3e3d7fae 100644
+--- a/dist/adapters/index.js.map
++++ b/dist/adapters/index.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/adapters/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;AAAA,+CAA6B;AAC7B,+CAA6B;AAC7B,4CAA0B;AAC1B,yCAAuB;AACvB,4CAA0B;AAC1B,yCAAuB"}
+\ No newline at end of file
++{"version":3,"file":"index.js","sourceRoot":"","sources":["../../src/adapters/index.ts"],"names":[],"mappings":";;;;;;;;;;;;;;;;AAAA,+CAA6B;AAC7B,+CAA6B;AAC7B,4CAA0B;AAC1B,yCAAuB;AACvB,4CAA0B;AAC1B,0CAAwB;AACxB,yCAAuB"}
+\ No newline at end of file
+diff --git a/dist/adapters/nuxt.d.ts.map b/dist/adapters/nuxt.d.ts.map
+index 7157a2af095af33e802055a688d28ce3d5ef9f4d..4e3a2b8edf3ec49fa21549ed84671466442280b4 100644
+--- a/dist/adapters/nuxt.d.ts.map
++++ b/dist/adapters/nuxt.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"nuxt.d.ts","sourceRoot":"","sources":["../../src/adapters/nuxt.ts"],"names":[],"mappings":";AACA,OAAO,KAAK,EAAE,mBAAmB,EAAE,kBAAkB,EAAE,MAAM,IAAI,CAAC;AAGlE,OAAO,EAAwB,aAAa,EAAE,MAAM,UAAU,CAAC;AAE/D,OAAO,EACL,mCAAmC,EAEpC,MAAM,kBAAkB,CAAC;AAE1B,MAAM,MAAM,+BAA+B,CAAC,OAAO,SAAS,aAAa,IAAI,IAAI,CAC/E,mCAAmC,CAAC,OAAO,EAAE,mBAAmB,EAAE,kBAAkB,CAAC,EACrF,aAAa,CACd,CAAC;AAEF,eAAO,MAAM,wBAAwB,oHA8CpC,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"nuxt.d.ts","sourceRoot":"","sources":["../../src/adapters/nuxt.ts"],"names":[],"mappings":";AACA,OAAO,KAAK,EAAE,mBAAmB,EAAE,kBAAkB,EAAE,MAAM,IAAI,CAAC;AAIlE,OAAO,EAAwB,aAAa,EAAE,MAAM,UAAU,CAAC;AAE/D,OAAO,EACL,mCAAmC,EAEpC,MAAM,kBAAkB,CAAC;AAE1B,MAAM,MAAM,+BAA+B,CAAC,OAAO,SAAS,aAAa,IAAI,IAAI,CAC/E,mCAAmC,CAAC,OAAO,EAAE,mBAAmB,EAAE,kBAAkB,CAAC,EACrF,aAAa,CACd,CAAC;AAMF,eAAO,MAAM,wBAAwB,oHA+CpC,CAAC"}
+\ No newline at end of file
+diff --git a/dist/adapters/nuxt.js b/dist/adapters/nuxt.js
+index 465dfb418c34149327a3ce7f915d25543d7f85fa..e29dec40b62c142215114bad7e2ae19a5779c379 100644
+--- a/dist/adapters/nuxt.js
++++ b/dist/adapters/nuxt.js
+@@ -41,6 +41,7 @@ const createOpenApiNuxtHandler = (opts) => {
+             event.node.res.end(JSON.stringify(body));
+             return;
+         }
++        event.node.req.query = (0, h3_1.getQuery)(event);
+         event.node.req.url = (0, path_1.normalizePath)(pathname);
+         await openApiHttpHandler(event.node.req, event.node.res);
+     });
+diff --git a/dist/adapters/nuxt.js.map b/dist/adapters/nuxt.js.map
+index f0648535785472824a0510aa88d8ec6661b68afe..c1450d28ec7551f9e236473233223676cfae7c4b 100644
+--- a/dist/adapters/nuxt.js.map
++++ b/dist/adapters/nuxt.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"nuxt.js","sourceRoot":"","sources":["../../src/adapters/nuxt.ts"],"names":[],"mappings":";;;AAAA,yCAAyC;AAEzC,2BAAwC;AAGxC,wCAA8C;AAC9C,2CAG0B;AAOnB,MAAM,wBAAwB,GAAG,CACtC,IAA8C,EAC9C,EAAE;IACF,MAAM,kBAAkB,GAAG,IAAA,mCAA4B,EAAC,IAAI,CAAC,CAAC;IAE9D,OAAO,IAAA,uBAAkB,EAAC,KAAK,EAAE,KAAK,EAAE,EAAE;;QACxC,IAAI,QAAQ,GAAkB,IAAI,CAAC;QAEnC,MAAM,MAAM,GAAG,KAAK,CAAC,OAAO,CAAC,MAAM,CAAC;QACpC,IAAI,MAAM,KAAI,MAAM,aAAN,MAAM,uBAAN,MAAM,CAAE,IAAI,CAAA,EAAE;YAC1B,IAAI,CAAC,MAAM,CAAC,IAAI,CAAC,QAAQ,CAAC,GAAG,CAAC,EAAE;gBAC9B,QAAQ,GAAG,MAAM,CAAC,IAAI,CAAC;aACxB;iBAAM;gBACL,QAAQ,GAAG,MAAM,CAAC,IAAI,CAAC;aACxB;SACF;QAED,IAAI,QAAQ,KAAK,IAAI,EAAE;YACrB,MAAM,KAAK,GAAG,IAAI,kBAAS,CAAC;gBAC1B,OAAO,EAAE,2EAA2E;gBACpF,IAAI,EAAE,uBAAuB;aAC9B,CAAC,CAAC;YAEH,MAAA,IAAI,CAAC,OAAO,qDAAG;gBACb,KAAK;gBACL,IAAI,EAAE,SAAS;gBACf,IAAI,EAAE,SAAS;gBACf,KAAK,EAAE,SAAS;gBAChB,GAAG,EAAE,SAAS;gBACd,GAAG,EAAE,KAAK,CAAC,IAAI,CAAC,GAAG;aACpB,CAAC,CAAC;YAEH,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,UAAU,GAAG,GAAG,CAAC;YAChC,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,SAAS,CAAC,cAAc,EAAE,kBAAkB,CAAC,CAAC;YAC7D,MAAM,IAAI,GAAyB;gBACjC,OAAO,EAAE,KAAK,CAAC,OAAO;gBACtB,IAAI,EAAE,KAAK,CAAC,IAAI;aACjB,CAAC;YACF,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,GAAG,CAAC,IAAI,CAAC,SAAS,CAAC,IAAI,CAAC,CAAC,CAAC;YAEzC,OAAO;SACR;QAED,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,GAAG,GAAG,IAAA,oBAAa,EAAC,QAAQ,CAAC,CAAC;QAC7C,MAAM,kBAAkB,CAAC,KAAK,CAAC,IAAI,CAAC,GAAG,EAAE,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,CAAC;IAC3D,CAAC,CAAC,CAAC;AACL,CAAC,CAAC;AA9CW,QAAA,wBAAwB,4BA8CnC"}
+\ No newline at end of file
++{"version":3,"file":"nuxt.js","sourceRoot":"","sources":["../../src/adapters/nuxt.ts"],"names":[],"mappings":";;;AAAA,yCAAyC;AAEzC,2BAAkD;AAIlD,wCAA8C;AAC9C,2CAG0B;AAWnB,MAAM,wBAAwB,GAAG,CACtC,IAA8C,EAC9C,EAAE;IACF,MAAM,kBAAkB,GAAG,IAAA,mCAA4B,EAAC,IAAI,CAAC,CAAC;IAE9D,OAAO,IAAA,uBAAkB,EAAC,KAAK,EAAE,KAAK,EAAE,EAAE;;QACxC,IAAI,QAAQ,GAAkB,IAAI,CAAC;QAEnC,MAAM,MAAM,GAAG,KAAK,CAAC,OAAO,CAAC,MAAM,CAAC;QACpC,IAAI,MAAM,KAAI,MAAM,aAAN,MAAM,uBAAN,MAAM,CAAE,IAAI,CAAA,EAAE;YAC1B,IAAI,CAAC,MAAM,CAAC,IAAI,CAAC,QAAQ,CAAC,GAAG,CAAC,EAAE;gBAC9B,QAAQ,GAAG,MAAM,CAAC,IAAI,CAAC;aACxB;iBAAM;gBACL,QAAQ,GAAG,MAAM,CAAC,IAAI,CAAC;aACxB;SACF;QAED,IAAI,QAAQ,KAAK,IAAI,EAAE;YACrB,MAAM,KAAK,GAAG,IAAI,kBAAS,CAAC;gBAC1B,OAAO,EAAE,2EAA2E;gBACpF,IAAI,EAAE,uBAAuB;aAC9B,CAAC,CAAC;YAEH,MAAA,IAAI,CAAC,OAAO,qDAAG;gBACb,KAAK;gBACL,IAAI,EAAE,SAAS;gBACf,IAAI,EAAE,SAAS;gBACf,KAAK,EAAE,SAAS;gBAChB,GAAG,EAAE,SAAS;gBACd,GAAG,EAAE,KAAK,CAAC,IAAI,CAAC,GAAG;aACpB,CAAC,CAAC;YAEH,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,UAAU,GAAG,GAAG,CAAC;YAChC,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,SAAS,CAAC,cAAc,EAAE,kBAAkB,CAAC,CAAC;YAC7D,MAAM,IAAI,GAAyB;gBACjC,OAAO,EAAE,KAAK,CAAC,OAAO;gBACtB,IAAI,EAAE,KAAK,CAAC,IAAI;aACjB,CAAC;YACF,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,GAAG,CAAC,IAAI,CAAC,SAAS,CAAC,IAAI,CAAC,CAAC,CAAC;YAEzC,OAAO;SACR;QAEA,KAAK,CAAC,IAAI,CAAC,GAAmB,CAAC,KAAK,GAAG,IAAA,aAAQ,EAAC,KAAK,CAAC,CAAC;QACxD,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,GAAG,GAAG,IAAA,oBAAa,EAAC,QAAQ,CAAC,CAAC;QAC7C,MAAM,kBAAkB,CAAC,KAAK,CAAC,IAAI,CAAC,GAAG,EAAE,KAAK,CAAC,IAAI,CAAC,GAAG,CAAC,CAAC;IAC3D,CAAC,CAAC,CAAC;AACL,CAAC,CAAC;AA/CW,QAAA,wBAAwB,4BA+CnC"}
+\ No newline at end of file
+diff --git a/dist/generator/paths.js b/dist/generator/paths.js
+index 259b45e72d980578bade38cb597786c7f0f9e8c2..3d84b16420311496859c0b13eba971cd3aa55449 100644
+--- a/dist/generator/paths.js
++++ b/dist/generator/paths.js
+@@ -60,7 +60,7 @@ const getOpenApiPathsObject = (appRouter, securitySchemeNames) => {
+                             ...headerParameters,
+                             ...((0, schema_1.getParameterObjects)(inputParser, pathParameters, 'all', (_d = openapi.example) === null || _d === void 0 ? void 0 : _d.request) || []),
+                         ],
+-                    })), { responses: (0, schema_1.getResponsesObject)(outputParser, (_e = openapi.example) === null || _e === void 0 ? void 0 : _e.response) }), (openapi.deprecated ? { deprecated: openapi.deprecated } : {})) });
++                    })), { responses: (0, schema_1.getResponsesObject)(outputParser, (_e = openapi.example) === null || _e === void 0 ? void 0 : _e.response, openapi.responseHeaders) }), (openapi.deprecated ? { deprecated: openapi.deprecated } : {})) });
+         }
+         catch (error) {
+             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+diff --git a/dist/generator/paths.js.map b/dist/generator/paths.js.map
+index 126aa2cce10373adeb09138c2d34a30953cfe1ec..9268c5c27fef7a1fd15801c3b0e2816fb4bdff09 100644
+--- a/dist/generator/paths.js.map
++++ b/dist/generator/paths.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"paths.js","sourceRoot":"","sources":["../../src/generator/paths.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"paths.js","sourceRoot":"","sources":["../../src/generator/paths.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/dist/generator/schema.d.ts b/dist/generator/schema.d.ts
+index 4d07a7fbaa00d2ef0a4a2749f75689d1bbdb96e3..74242fb6e8a966a883f4c31b10de802d27b833e4 100644
+--- a/dist/generator/schema.d.ts
++++ b/dist/generator/schema.d.ts
+@@ -3,5 +3,5 @@ import { OpenApiContentType } from '../types';
+ export declare const getParameterObjects: (schema: unknown, pathParameters: string[], inType: 'all' | 'path' | 'query', example: Record<string, any> | undefined) => OpenAPIV3.ParameterObject[] | undefined;
+ export declare const getRequestBodyObject: (schema: unknown, pathParameters: string[], contentTypes: OpenApiContentType[], example: Record<string, any> | undefined) => OpenAPIV3.RequestBodyObject | undefined;
+ export declare const errorResponseObject: OpenAPIV3.ResponseObject;
+-export declare const getResponsesObject: (schema: unknown, example: Record<string, any> | undefined) => OpenAPIV3.ResponsesObject;
++export declare const getResponsesObject: (schema: unknown, example: Record<string, any> | undefined, headers: Record<string, OpenAPIV3.HeaderObject | OpenAPIV3.ReferenceObject> | undefined) => OpenAPIV3.ResponsesObject;
+ //# sourceMappingURL=schema.d.ts.map
+\ No newline at end of file
+diff --git a/dist/generator/schema.d.ts.map b/dist/generator/schema.d.ts.map
+index b9c4ec531b788c0ac061e9002900da25bf473868..13518ec5abb3189bd5c687fa89bd89d4b894e2e2 100644
+--- a/dist/generator/schema.d.ts.map
++++ b/dist/generator/schema.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"schema.d.ts","sourceRoot":"","sources":["../../src/generator/schema.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,SAAS,EAAE,MAAM,eAAe,CAAC;AAI1C,OAAO,EAAE,kBAAkB,EAAE,MAAM,UAAU,CAAC;AAiB9C,eAAO,MAAM,mBAAmB,WACtB,OAAO,kBACC,MAAM,EAAE,UAChB,KAAK,GAAG,MAAM,GAAG,OAAO,WACvB,OAAO,MAAM,EAAE,GAAG,CAAC,GAAG,SAAS,KACvC,UAAU,eAAe,EAAE,GAAG,SAsFhC,CAAC;AAEF,eAAO,MAAM,oBAAoB,WACvB,OAAO,kBACC,MAAM,EAAE,gBACV,kBAAkB,EAAE,WACzB,OAAO,MAAM,EAAE,GAAG,CAAC,GAAG,SAAS,KACvC,UAAU,iBAAiB,GAAG,SAmDhC,CAAC;AAEF,eAAO,MAAM,mBAAmB,EAAE,SAAS,CAAC,cAa3C,CAAC;AAEF,eAAO,MAAM,kBAAkB,WACrB,OAAO,WACN,OAAO,MAAM,EAAE,GAAG,CAAC,GAAG,SAAS,KACvC,UAAU,eAwBZ,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"schema.d.ts","sourceRoot":"","sources":["../../src/generator/schema.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,SAAS,EAAE,MAAM,eAAe,CAAC;AAI1C,OAAO,EAAE,kBAAkB,EAAE,MAAM,UAAU,CAAC;AAiB9C,eAAO,MAAM,mBAAmB,WACtB,OAAO,kBACC,MAAM,EAAE,UAChB,KAAK,GAAG,MAAM,GAAG,OAAO,WACvB,OAAO,MAAM,EAAE,GAAG,CAAC,GAAG,SAAS,KACvC,UAAU,eAAe,EAAE,GAAG,SAsFhC,CAAC;AAEF,eAAO,MAAM,oBAAoB,WACvB,OAAO,kBACC,MAAM,EAAE,gBACV,kBAAkB,EAAE,WACzB,OAAO,MAAM,EAAE,GAAG,CAAC,GAAG,SAAS,KACvC,UAAU,iBAAiB,GAAG,SAmDhC,CAAC;AAEF,eAAO,MAAM,mBAAmB,EAAE,SAAS,CAAC,cAa3C,CAAC;AAEF,eAAO,MAAM,kBAAkB,WACrB,OAAO,WACN,OAAO,MAAM,EAAE,GAAG,CAAC,GAAG,SAAS,WAC/B,OAAO,MAAM,EAAE,UAAU,YAAY,GAAG,UAAU,eAAe,CAAC,GAAG,SAAS,KACtF,UAAU,eAyBZ,CAAC"}
+\ No newline at end of file
+diff --git a/dist/generator/schema.js b/dist/generator/schema.js
+index e86de25d204050f5b35948f90790ab8f952b0edb..c613afd18f7c27de90c38c916e50452ebd7bc0cb 100644
+--- a/dist/generator/schema.js
++++ b/dist/generator/schema.js
+@@ -161,7 +161,7 @@ exports.errorResponseObject = {
+         },
+     },
+ };
+-const getResponsesObject = (schema, example) => {
++const getResponsesObject = (schema, example, headers) => {
+     if (!(0, zod_2.instanceofZodType)(schema)) {
+         throw new server_1.TRPCError({
+             message: 'Output parser expects a Zod validator',
+@@ -170,6 +170,7 @@ const getResponsesObject = (schema, example) => {
+     }
+     const successResponseObject = {
+         description: 'Successful response',
++        headers: headers,
+         content: {
+             'application/json': {
+                 schema: zodSchemaToOpenApiSchemaObject(schema),
+diff --git a/dist/generator/schema.js.map b/dist/generator/schema.js.map
+index fbd6e04b5d2239f0ab6a213e07187a43f299913f..28070f49f0fb3d1ba91322cda00bb43c0399e63d 100644
+--- a/dist/generator/schema.js.map
++++ b/dist/generator/schema.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"schema.js","sourceRoot":"","sources":["../../src/generator/schema.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"schema.js","sourceRoot":"","sources":["../../src/generator/schema.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index 410c19c98cd66e94a336b4db15e4e919bdd5428a..950f9a209fe949909fa38591ff99b4efeb02fb5c 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -1,6 +1,6 @@
+-import { CreateOpenApiAwsLambdaHandlerOptions, CreateOpenApiExpressMiddlewareOptions, CreateOpenApiFastifyPluginOptions, CreateOpenApiHttpHandlerOptions, CreateOpenApiNextHandlerOptions, CreateOpenApiNuxtHandlerOptions, createOpenApiAwsLambdaHandler, createOpenApiExpressMiddleware, createOpenApiHttpHandler, createOpenApiNextHandler, createOpenApiNuxtHandler, fastifyTRPCOpenApiPlugin } from './adapters';
++import { CreateOpenApiAwsLambdaHandlerOptions, CreateOpenApiExpressMiddlewareOptions, CreateOpenApiFastifyPluginOptions, CreateOpenApiFetchHandlerOptions, CreateOpenApiHttpHandlerOptions, CreateOpenApiNextHandlerOptions, CreateOpenApiNuxtHandlerOptions, createOpenApiAwsLambdaHandler, createOpenApiExpressMiddleware, createOpenApiFetchHandler, createOpenApiHttpHandler, createOpenApiNextHandler, createOpenApiNuxtHandler, fastifyTRPCOpenApiPlugin } from './adapters';
+ import { GenerateOpenApiDocumentOptions, generateOpenApiDocument, openApiVersion } from './generator';
+ import { OpenApiErrorResponse, OpenApiMeta, OpenApiMethod, OpenApiResponse, OpenApiRouter, OpenApiSuccessResponse } from './types';
+ import { ZodTypeLikeString, ZodTypeLikeVoid } from './utils/zod';
+-export { CreateOpenApiAwsLambdaHandlerOptions, CreateOpenApiExpressMiddlewareOptions, CreateOpenApiHttpHandlerOptions, CreateOpenApiNextHandlerOptions, CreateOpenApiFastifyPluginOptions, CreateOpenApiNuxtHandlerOptions, createOpenApiExpressMiddleware, createOpenApiHttpHandler, createOpenApiNextHandler, createOpenApiNuxtHandler, createOpenApiAwsLambdaHandler, fastifyTRPCOpenApiPlugin, openApiVersion, generateOpenApiDocument, GenerateOpenApiDocumentOptions, OpenApiRouter, OpenApiMeta, OpenApiMethod, OpenApiResponse, OpenApiSuccessResponse, OpenApiErrorResponse, ZodTypeLikeString, ZodTypeLikeVoid, };
++export { CreateOpenApiAwsLambdaHandlerOptions, CreateOpenApiExpressMiddlewareOptions, CreateOpenApiHttpHandlerOptions, CreateOpenApiNextHandlerOptions, CreateOpenApiFastifyPluginOptions, CreateOpenApiFetchHandlerOptions, CreateOpenApiNuxtHandlerOptions, createOpenApiExpressMiddleware, createOpenApiFetchHandler, createOpenApiHttpHandler, createOpenApiNextHandler, createOpenApiNuxtHandler, createOpenApiAwsLambdaHandler, fastifyTRPCOpenApiPlugin, openApiVersion, generateOpenApiDocument, GenerateOpenApiDocumentOptions, OpenApiRouter, OpenApiMeta, OpenApiMethod, OpenApiResponse, OpenApiSuccessResponse, OpenApiErrorResponse, ZodTypeLikeString, ZodTypeLikeVoid, };
+ //# sourceMappingURL=index.d.ts.map
+\ No newline at end of file
+diff --git a/dist/index.d.ts.map b/dist/index.d.ts.map
+index 517f5276178dff6f59219bbe3487e85074136b96..9b9380a18fea8eaf40ef0fe7f32096c6c4ff559a 100644
+--- a/dist/index.d.ts.map
++++ b/dist/index.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,OAAO,EACL,oCAAoC,EACpC,qCAAqC,EACrC,iCAAiC,EACjC,+BAA+B,EAC/B,+BAA+B,EAC/B,+BAA+B,EAC/B,6BAA6B,EAC7B,8BAA8B,EAC9B,wBAAwB,EACxB,wBAAwB,EACxB,wBAAwB,EACxB,wBAAwB,EACzB,MAAM,YAAY,CAAC;AACpB,OAAO,EACL,8BAA8B,EAC9B,uBAAuB,EACvB,cAAc,EACf,MAAM,aAAa,CAAC;AACrB,OAAO,EACL,oBAAoB,EACpB,WAAW,EACX,aAAa,EACb,eAAe,EACf,aAAa,EACb,sBAAsB,EACvB,MAAM,SAAS,CAAC;AACjB,OAAO,EAAE,iBAAiB,EAAE,eAAe,EAAE,MAAM,aAAa,CAAC;AAEjE,OAAO,EACL,oCAAoC,EACpC,qCAAqC,EACrC,+BAA+B,EAC/B,+BAA+B,EAC/B,iCAAiC,EACjC,+BAA+B,EAC/B,8BAA8B,EAC9B,wBAAwB,EACxB,wBAAwB,EACxB,wBAAwB,EACxB,6BAA6B,EAC7B,wBAAwB,EACxB,cAAc,EACd,uBAAuB,EACvB,8BAA8B,EAC9B,aAAa,EACb,WAAW,EACX,aAAa,EACb,eAAe,EACf,sBAAsB,EACtB,oBAAoB,EACpB,iBAAiB,EACjB,eAAe,GAChB,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"index.d.ts","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":"AAAA,OAAO,EACL,oCAAoC,EACpC,qCAAqC,EACrC,iCAAiC,EACjC,gCAAgC,EAChC,+BAA+B,EAC/B,+BAA+B,EAC/B,+BAA+B,EAC/B,6BAA6B,EAC7B,8BAA8B,EAC9B,yBAAyB,EACzB,wBAAwB,EACxB,wBAAwB,EACxB,wBAAwB,EACxB,wBAAwB,EACzB,MAAM,YAAY,CAAC;AACpB,OAAO,EACL,8BAA8B,EAC9B,uBAAuB,EACvB,cAAc,EACf,MAAM,aAAa,CAAC;AACrB,OAAO,EACL,oBAAoB,EACpB,WAAW,EACX,aAAa,EACb,eAAe,EACf,aAAa,EACb,sBAAsB,EACvB,MAAM,SAAS,CAAC;AACjB,OAAO,EAAE,iBAAiB,EAAE,eAAe,EAAE,MAAM,aAAa,CAAC;AAEjE,OAAO,EACL,oCAAoC,EACpC,qCAAqC,EACrC,+BAA+B,EAC/B,+BAA+B,EAC/B,iCAAiC,EACjC,gCAAgC,EAChC,+BAA+B,EAC/B,8BAA8B,EAC9B,yBAAyB,EACzB,wBAAwB,EACxB,wBAAwB,EACxB,wBAAwB,EACxB,6BAA6B,EAC7B,wBAAwB,EACxB,cAAc,EACd,uBAAuB,EACvB,8BAA8B,EAC9B,aAAa,EACb,WAAW,EACX,aAAa,EACb,eAAe,EACf,sBAAsB,EACtB,oBAAoB,EACpB,iBAAiB,EACjB,eAAe,GAChB,CAAC"}
+\ No newline at end of file
+diff --git a/dist/index.js b/dist/index.js
+index 6122541a7e2ab845af07fc54b4b4e86c2c334b36..cd265d6cee0975c97e537372c93ef1ce92962942 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -1,9 +1,10 @@
+ "use strict";
+ Object.defineProperty(exports, "__esModule", { value: true });
+-exports.generateOpenApiDocument = exports.openApiVersion = exports.fastifyTRPCOpenApiPlugin = exports.createOpenApiAwsLambdaHandler = exports.createOpenApiNuxtHandler = exports.createOpenApiNextHandler = exports.createOpenApiHttpHandler = exports.createOpenApiExpressMiddleware = void 0;
++exports.generateOpenApiDocument = exports.openApiVersion = exports.fastifyTRPCOpenApiPlugin = exports.createOpenApiAwsLambdaHandler = exports.createOpenApiNuxtHandler = exports.createOpenApiNextHandler = exports.createOpenApiHttpHandler = exports.createOpenApiFetchHandler = exports.createOpenApiExpressMiddleware = void 0;
+ const adapters_1 = require("./adapters");
+ Object.defineProperty(exports, "createOpenApiAwsLambdaHandler", { enumerable: true, get: function () { return adapters_1.createOpenApiAwsLambdaHandler; } });
+ Object.defineProperty(exports, "createOpenApiExpressMiddleware", { enumerable: true, get: function () { return adapters_1.createOpenApiExpressMiddleware; } });
++Object.defineProperty(exports, "createOpenApiFetchHandler", { enumerable: true, get: function () { return adapters_1.createOpenApiFetchHandler; } });
+ Object.defineProperty(exports, "createOpenApiHttpHandler", { enumerable: true, get: function () { return adapters_1.createOpenApiHttpHandler; } });
+ Object.defineProperty(exports, "createOpenApiNextHandler", { enumerable: true, get: function () { return adapters_1.createOpenApiNextHandler; } });
+ Object.defineProperty(exports, "createOpenApiNuxtHandler", { enumerable: true, get: function () { return adapters_1.createOpenApiNuxtHandler; } });
+diff --git a/dist/index.js.map b/dist/index.js.map
+index 55c97dc59d402fa5aae4bde972f8e3a4956fb686..8e88ef70b8524d60c8d9479c3e37b7e012b49ff4 100644
+--- a/dist/index.js.map
++++ b/dist/index.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"index.js","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":";;;AAAA,yCAaoB;AA2BlB,8GAjCA,wCAA6B,OAiCA;AAJ7B,+GA5BA,yCAA8B,OA4BA;AAC9B,yGA5BA,mCAAwB,OA4BA;AACxB,yGA5BA,mCAAwB,OA4BA;AACxB,yGA5BA,mCAAwB,OA4BA;AAExB,yGA7BA,mCAAwB,OA6BA;AA3B1B,2CAIqB;AAyBnB,wGA3BA,mCAAuB,OA2BA;AADvB,+FAzBA,0BAAc,OAyBA"}
+\ No newline at end of file
++{"version":3,"file":"index.js","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":";;;AAAA,yCAeoB;AA6BlB,8GApCA,wCAA6B,OAoCA;AAL7B,+GA9BA,yCAA8B,OA8BA;AAC9B,0GA9BA,oCAAyB,OA8BA;AACzB,yGA9BA,mCAAwB,OA8BA;AACxB,yGA9BA,mCAAwB,OA8BA;AACxB,yGA9BA,mCAAwB,OA8BA;AAExB,yGA/BA,mCAAwB,OA+BA;AA7B1B,2CAIqB;AA2BnB,wGA7BA,mCAAuB,OA6BA;AADvB,+FA3BA,0BAAc,OA2BA"}
+\ No newline at end of file
+diff --git a/dist/types.d.ts b/dist/types.d.ts
+index d93e38e020d89bef3e615c44fe687b10c8874417..597bb00486d050027d3c05e25ff09b54f2cb9172 100644
+--- a/dist/types.d.ts
++++ b/dist/types.d.ts
+@@ -26,6 +26,7 @@ export type OpenApiMeta<TMeta = TRPCMeta> = TMeta & {
+             request?: Record<string, any>;
+             response?: Record<string, any>;
+         };
++        responseHeaders?: Record<string, OpenAPIV3.HeaderObject | OpenAPIV3.ReferenceObject>;
+     };
+ };
+ export type OpenApiProcedure<TMeta = TRPCMeta> = Procedure<'query' | 'mutation', ProcedureParams<RootConfig<{
+diff --git a/dist/types.d.ts.map b/dist/types.d.ts.map
+index d7aeb76f1431c7ad5413df12ab4b419db0481ec9..24bfd32dc02ccd33e322eea33d4816ffedc388a1 100644
+--- a/dist/types.d.ts.map
++++ b/dist/types.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"types.d.ts","sourceRoot":"","sources":["../src/types.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
++{"version":3,"file":"types.d.ts","sourceRoot":"","sources":["../src/types.ts"],"names":[],"mappings":"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"}
+\ No newline at end of file
+diff --git a/dist/utils/procedure.d.ts.map b/dist/utils/procedure.d.ts.map
+index a51c4362f347aa6c546124a4fe7b6911f5ecc414..df26dab54d208c96a53cb69f6eaf788de432f344 100644
+--- a/dist/utils/procedure.d.ts.map
++++ b/dist/utils/procedure.d.ts.map
+@@ -1 +1 @@
+-{"version":3,"file":"procedure.d.ts","sourceRoot":"","sources":["../../src/utils/procedure.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,aAAa,EAAE,MAAM,cAAc,CAAC;AAC7C,OAAO,EAAE,YAAY,EAAK,MAAM,KAAK,CAAC;AAEtC,OAAO,EAAE,WAAW,EAAE,gBAAgB,EAAE,sBAAsB,EAAE,MAAM,UAAU,CAAC;AASjF,eAAO,MAAM,qBAAqB;;;CAMjC,CAAC;AASF,eAAO,MAAM,uBAAuB,oBACjB,sBAAsB,qBACpB;IACjB,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,EAAE,aAAa,CAAC;IACpB,SAAS,EAAE,gBAAgB,CAAC;IAC5B,OAAO,EAAE,YAAY,WAAW,CAAC,SAAS,CAAC,CAAC,CAAC;CAC9C,KAAK,IAAI,SASX,CAAC"}
+\ No newline at end of file
++{"version":3,"file":"procedure.d.ts","sourceRoot":"","sources":["../../src/utils/procedure.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,aAAa,EAAE,MAAM,cAAc,CAAC;AAC7C,OAAO,EAAE,YAAY,EAAK,MAAM,KAAK,CAAC;AAEtC,OAAO,EAAE,WAAW,EAAE,gBAAgB,EAAE,sBAAsB,EAAE,MAAM,UAAU,CAAC;AASjF,eAAO,MAAM,qBAAqB;;;CAMjC,CAAC;AAYF,eAAO,MAAM,uBAAuB,oBACjB,sBAAsB,qBACpB;IACjB,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,EAAE,aAAa,CAAC;IACpB,SAAS,EAAE,gBAAgB,CAAC;IAC5B,OAAO,EAAE,YAAY,WAAW,CAAC,SAAS,CAAC,CAAC,CAAC;CAC9C,KAAK,IAAI,SASX,CAAC"}
+\ No newline at end of file
+diff --git a/dist/utils/procedure.js b/dist/utils/procedure.js
+index c838521e9c8d50febf7428a3c91060353bc0366e..4ee4961f9780e3d0a47dd65f4469e24f81d1d8c7 100644
+--- a/dist/utils/procedure.js
++++ b/dist/utils/procedure.js
+@@ -23,6 +23,10 @@ const getProcedureType = (procedure) => {
+         return 'mutation';
+     if (procedure._def.subscription)
+         return 'subscription';
++    // @ts-expect-error: looks to be something from v11
++    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
++    if (procedure._def.type)
++        return procedure._def.type;
+     throw new Error('Unknown procedure type');
+ };
+ const forEachOpenApiProcedure = (procedureRecord, callback) => {
+diff --git a/dist/utils/procedure.js.map b/dist/utils/procedure.js.map
+index 0375bf1ef0ef4c710a8e41354ff1652ecceaf781..8af787de9313feab381ad240b3b81638a7548196 100644
+--- a/dist/utils/procedure.js.map
++++ b/dist/utils/procedure.js.map
+@@ -1 +1 @@
+-{"version":3,"file":"procedure.js","sourceRoot":"","sources":["../../src/utils/procedure.ts"],"names":[],"mappings":";;;AAEA,6BAAsC;AAItC,MAAM,WAAW,GAAG,CAAC,YAA4B,EAAgB,EAAE;IACjE,OAAO,YAAY,CAAC,MAAM,CAAC,CAAC,GAAG,EAAE,WAAW,EAAE,EAAE;QAC9C,OAAO,GAAG,CAAC,KAAK,CAAC,WAAW,CAAC,CAAC;IAChC,CAAC,EAAE,OAAC,CAAC,MAAM,CAAC,EAAE,CAAC,CAAC,CAAC;AACnB,CAAC,CAAC;AAEF,4EAA4E;AACrE,MAAM,qBAAqB,GAAG,CAAC,SAA2B,EAAE,EAAE;IACnE,MAAM,EAAE,MAAM,EAAE,MAAM,EAAE,GAAG,SAAS,CAAC,IAAI,CAAC;IAC1C,OAAO;QACL,WAAW,EAAE,MAAM,CAAC,MAAM,IAAI,CAAC,CAAC,CAAC,CAAC,WAAW,CAAC,MAAwB,CAAC,CAAC,CAAC,CAAC,MAAM,CAAC,CAAC,CAAC;QACnF,YAAY,EAAE,MAAM;KACrB,CAAC;AACJ,CAAC,CAAC;AANW,QAAA,qBAAqB,yBAMhC;AAEF,MAAM,gBAAgB,GAAG,CAAC,SAA2B,EAAiB,EAAE;IACtE,IAAI,SAAS,CAAC,IAAI,CAAC,KAAK;QAAE,OAAO,OAAO,CAAC;IACzC,IAAI,SAAS,CAAC,IAAI,CAAC,QAAQ;QAAE,OAAO,UAAU,CAAC;IAC/C,IAAI,SAAS,CAAC,IAAI,CAAC,YAAY;QAAE,OAAO,cAAc,CAAC;IACvD,MAAM,IAAI,KAAK,CAAC,wBAAwB,CAAC,CAAC;AAC5C,CAAC,CAAC;AAEK,MAAM,uBAAuB,GAAG,CACrC,eAAuC,EACvC,QAKU,EACV,EAAE;;IACF,KAAK,MAAM,CAAC,IAAI,EAAE,SAAS,CAAC,IAAI,MAAM,CAAC,OAAO,CAAC,eAAe,CAAC,EAAE;QAC/D,MAAM,EAAE,OAAO,EAAE,GAAG,MAAA,SAAS,CAAC,IAAI,CAAC,IAAI,mCAAI,EAAE,CAAC;QAC9C,IAAI,OAAO,IAAI,OAAO,CAAC,OAAO,KAAK,KAAK,EAAE;YACxC,MAAM,IAAI,GAAG,gBAAgB,CAAC,SAAS,CAAC,CAAC;YACzC,QAAQ,CAAC,EAAE,IAAI,EAAE,IAAI,EAAE,SAAS,EAAE,OAAO,EAAE,CAAC,CAAC;SAC9C;KACF;AACH,CAAC,CAAC;AAhBW,QAAA,uBAAuB,2BAgBlC"}
+\ No newline at end of file
++{"version":3,"file":"procedure.js","sourceRoot":"","sources":["../../src/utils/procedure.ts"],"names":[],"mappings":";;;AAEA,6BAAsC;AAItC,MAAM,WAAW,GAAG,CAAC,YAA4B,EAAgB,EAAE;IACjE,OAAO,YAAY,CAAC,MAAM,CAAC,CAAC,GAAG,EAAE,WAAW,EAAE,EAAE;QAC9C,OAAO,GAAG,CAAC,KAAK,CAAC,WAAW,CAAC,CAAC;IAChC,CAAC,EAAE,OAAC,CAAC,MAAM,CAAC,EAAE,CAAC,CAAC,CAAC;AACnB,CAAC,CAAC;AAEF,4EAA4E;AACrE,MAAM,qBAAqB,GAAG,CAAC,SAA2B,EAAE,EAAE;IACnE,MAAM,EAAE,MAAM,EAAE,MAAM,EAAE,GAAG,SAAS,CAAC,IAAI,CAAC;IAC1C,OAAO;QACL,WAAW,EAAE,MAAM,CAAC,MAAM,IAAI,CAAC,CAAC,CAAC,CAAC,WAAW,CAAC,MAAwB,CAAC,CAAC,CAAC,CAAC,MAAM,CAAC,CAAC,CAAC;QACnF,YAAY,EAAE,MAAM;KACrB,CAAC;AACJ,CAAC,CAAC;AANW,QAAA,qBAAqB,yBAMhC;AAEF,MAAM,gBAAgB,GAAG,CAAC,SAA2B,EAAiB,EAAE;IACtE,IAAI,SAAS,CAAC,IAAI,CAAC,KAAK;QAAE,OAAO,OAAO,CAAC;IACzC,IAAI,SAAS,CAAC,IAAI,CAAC,QAAQ;QAAE,OAAO,UAAU,CAAC;IAC/C,IAAI,SAAS,CAAC,IAAI,CAAC,YAAY;QAAE,OAAO,cAAc,CAAC;IACvD,mDAAmD;IACnD,+DAA+D;IAC/D,IAAI,SAAS,CAAC,IAAI,CAAC,IAAI;QAAE,OAAO,SAAS,CAAC,IAAI,CAAC,IAAI,CAAC;IACpD,MAAM,IAAI,KAAK,CAAC,wBAAwB,CAAC,CAAC;AAC5C,CAAC,CAAC;AAEK,MAAM,uBAAuB,GAAG,CACrC,eAAuC,EACvC,QAKU,EACV,EAAE;;IACF,KAAK,MAAM,CAAC,IAAI,EAAE,SAAS,CAAC,IAAI,MAAM,CAAC,OAAO,CAAC,eAAe,CAAC,EAAE;QAC/D,MAAM,EAAE,OAAO,EAAE,GAAG,MAAA,SAAS,CAAC,IAAI,CAAC,IAAI,mCAAI,EAAE,CAAC;QAC9C,IAAI,OAAO,IAAI,OAAO,CAAC,OAAO,KAAK,KAAK,EAAE;YACxC,MAAM,IAAI,GAAG,gBAAgB,CAAC,SAAS,CAAC,CAAC;YACzC,QAAQ,CAAC,EAAE,IAAI,EAAE,IAAI,EAAE,SAAS,EAAE,OAAO,EAAE,CAAC,CAAC;SAC9C;KACF;AACH,CAAC,CAAC;AAhBW,QAAA,uBAAuB,2BAgBlC"}
+\ No newline at end of file
+diff --git a/package.json b/package.json
+index 2a295ec280edf0047f298025c7a944223b7f6818..994ec43ca03f8b5f6469387ced5e22a429ca2109 100644
+--- a/package.json
++++ b/package.json
+@@ -18,6 +18,7 @@
+   "workspaces": [
+     ".",
+     "examples/with-nextjs",
++    "examples/with-nextjs-appdir",
+     "examples/with-express",
+     "examples/with-interop",
+     "examples/with-serverless",
