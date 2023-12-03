@@ -15,9 +15,12 @@
     "db:seed": "prisma db seed",
     "db:migrate:dev": "prisma migrate dev",
     "db:reset": "prisma migrate reset --force --skip-seed",
-    "mod": "pnpm jscodeshift drizzle/schema.ts -t addDefaultToIdTransformer.js -d -p"
+    "mod": "pnpm jscodeshift drizzle/schema.ts -t addDefaultToIdTransformer.js -d -p",
+    "api:generate": "openapi-generator-cli generate -i openapi.json -g ruby -o ./tmp/ruby/",
+    "api:generate:javascript": "openapi-generator-cli generate -i openapi.json -g javascript -o ./tmp/javascript/"
   },
   "dependencies": {
+    "@openapitools/openapi-generator-cli": "^2.7.0",
     "@paralleldrive/cuid2": "^2.2.2",
     "@prisma/client": "5.6.0",
     "@tanstack/react-query": "^4.36.1",
