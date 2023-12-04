@@ -12,7 +12,7 @@ For `trpc`, install with `@next` to support React Query 5.
 
 > Update: Cannot support React Query 5 just yet.
 
-`pnpm add @trpc/client@next @trpc/react-query@next @trpc/server@next @tanstack/react-query`
+`pnpm add @trpc/client @trpc/react-query @trpc/server @tanstack/react-query@^4.36.1 trpc-openapi`
 
 Next, setup the `src/utils/trpc` folder:
 
