@@ -10,6 +10,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator drizzle {
+  provider = "prisma-generator-drizzle"
+
+  // Specify the output directory
+  output = "../src/libs/drizzle"
+}
+
 // Model for Author
 model Author {
   id    String @id @default(cuid())

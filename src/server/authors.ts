@@ -2,8 +2,9 @@ import { t } from "@/libs/trpc/createRouter";
 import { db } from "@/utils/db";
 import { z } from "zod";
 import { selectAuthorSchema, insertAuthorSchema } from "../libs/drizzle/zod";
-import { author } from "../libs/drizzle/schema";
+import { schema } from "../libs/drizzle/schema";
 import { sql } from "drizzle-orm/sql";
+import { createId } from "@paralleldrive/cuid2";
 
 export const authors = t.router({
   findManyAuthors: t.procedure
@@ -11,7 +12,7 @@ export const authors = t.router({
     .input(z.void())
     .output(z.array(selectAuthorSchema))
     .query(async () => {
-      return await db.query.author.findMany();
+      return await db.query.authors.findMany();
     }),
   findUniqueAuthorById: t.procedure
     .meta({ openapi: { method: "GET", path: "/authors/{id}" } })
@@ -19,7 +20,7 @@ export const authors = t.router({
     .output(selectAuthorSchema)
     .query(async (req) => {
       const result = await db.execute<z.infer<typeof selectAuthorSchema>>(
-        sql`SELECT * FROM ${author} WHERE ${author.id} = ${req.input.id}`
+        sql`SELECT * FROM ${schema.authors} WHERE ${schema.authors.id} = ${req.input.id}`
       );
       return result[0];
     }),
@@ -28,7 +29,13 @@ export const authors = t.router({
     .input(insertAuthorSchema.omit({ id: true }))
     .output(selectAuthorSchema)
     .mutation(async (req) => {
-      const result = await db.insert(author).values(req.input).returning();
+      const result = await db
+        .insert(schema.authors)
+        .values({
+          id: createId(),
+          ...req.input,
+        })
+        .returning();
       return result[0];
     }),
 });

@@ -1,9 +1,9 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 
-import { post, author } from "./schema";
+import { schema } from "./schema";
 
 // Schema for inserting a user - can be used to validate API requests
-export const insertAuthorSchema = createInsertSchema(author);
+export const insertAuthorSchema = createInsertSchema(schema.authors);
 
 // Schema for selecting a user - can be used to validate API responses
-export const selectAuthorSchema = createSelectSchema(author);
+export const selectAuthorSchema = createSelectSchema(schema.authors);
